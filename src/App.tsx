@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import checklistData from './checklistData';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 const CHECKLIST_KEY = 'muiChecklist';
 const EXPIRY_KEY = 'muiChecklistExpiry';
@@ -135,28 +136,30 @@ function App() {
         <Box sx={{ p: isMobile ? 2 : 5, borderRadius: 4, maxWidth: isNarrowPC ? '100%' : 700, width: '100%', backgroundColor: '#fff', boxShadow: 3 }}>
           <Box display="flex" flexDirection="column" gap={1.5} mb={3}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="h5" fontWeight={700}>📋 오늘의 물물교환 체크리스트</Typography>
-              <Button
-                variant="contained"
-                onClick={handleReset}
-                sx={{
-                  backgroundColor: '#ddd', 
-                  color: '#2a2a2a',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  paddingY: '8px',
-                  paddingX: '16px',
-                  fontSize: '0.875rem',
-                  borderRadius: '10px',
-                  boxShadow: 'none',
-                  lineHeight: '22px',
-                  '&:hover': {
-                    backgroundColor: '#ccc' 
-                  }
-                }}
-              >
-                전체 리셋
-              </Button>
+            <Typography
+              variant="h5"
+              fontWeight={700}
+              fontSize={{ xs: '1.1rem', sm: '1.5rem' }}
+            >
+              📋 오늘의 물물교환 체크리스트
+            </Typography>
+            <Button
+              onClick={handleReset}
+              variant="outlined"
+              color="secondary"
+              size="small"
+              sx={{
+                minWidth: 0,
+                padding: 1,
+                borderRadius: '50%',
+                backgroundColor: '#f6f3f9',
+                '&:hover': {
+                  backgroundColor: '#e6e0f0'
+                }
+              }}
+            >
+              <RestartAltIcon fontSize="small" />
+            </Button>
             </Box>
             <Typography variant="body2" color="text.secondary" fontSize={13}>
               *매일 오전 6시에 자동으로 리셋됩니다.
