@@ -138,10 +138,22 @@ function App() {
               <Typography variant="h5" fontWeight={700}>📋 오늘의 교환 체크리스트</Typography>
               <Button
                 variant="contained"
-                color="primary"
-                size="small"
                 onClick={handleReset}
-                sx={{ textTransform: 'none', fontWeight: 600 }}
+                sx={{
+                  backgroundColor: '#ddd', 
+                  color: '#2a2a2a',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  paddingY: '8px',
+                  paddingX: '16px',
+                  fontSize: '0.875rem',
+                  borderRadius: '10px',
+                  boxShadow: 'none',
+                  lineHeight: '22px',
+                  '&:hover': {
+                    backgroundColor: '#ccc' 
+                  }
+                }}
               >
                 전체 리셋
               </Button>
@@ -163,31 +175,64 @@ function App() {
                       <Typography fontSize={16} fontWeight={700} mb={1}>{npc}</Typography>
                     )}
                     {isMobile ? (
-                      <Stack spacing={1}>
-                        {items.map((item, index) => {
-                          const key = `${npc}-${index}`;
-                          const isChecked = checked[key] || false;
-                          return (
-                            <Grow in timeout={300} key={key}>
-                              <Box display="flex" justifyContent="space-between" alignItems="center" p={1.5} borderRadius={2} sx={{ backgroundColor: isChecked ? '#e0e0e0' : '#f9f9f9', opacity: isChecked ? 0.6 : 1, border: '1px solid #ddd' }}>
-                                <Box>
-                                  <Typography fontSize='0.95rem' fontWeight={500} fontFamily='"Noto Sans KR", sans-serif'>
-                                    {item.gives} → {item.receives}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    NPC: {npc}
-                                  </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                  <Chip label={item.limit} size="small" />
-                                  <Checkbox size="small" checked={isChecked} onChange={() => handleCheck(key)} />
-                                </Box>
-                              </Box>
-                            </Grow>
-                          );
-                        })}
-                      </Stack>
-                    ) : (
+  <Stack spacing={1}>
+    {items.map((item, index) => {
+      const key = `${npc}-${index}`;
+      const isChecked = checked[key] || false;
+      return (
+        <Grow in timeout={300} key={key}>
+          <Box
+            onClick={() => handleCheck(key)}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            p={1.5}
+            borderRadius={2}
+            sx={{
+              backgroundColor: isChecked ? 'rgba(240, 240, 240, 0.9)' : 'rgba(250, 250, 250, 0.95)',
+              opacity: 0.8,
+              border: '1px solid #ddd',
+              cursor: 'pointer'
+            }}
+          >
+            <Box>
+              <Typography
+                fontSize='0.95rem'
+                fontWeight={500}
+                fontFamily='"Noto Sans KR", sans-serif'
+              >
+                {item.gives}
+              </Typography>
+              <Typography
+                fontSize='0.95rem'
+                fontWeight={500}
+                fontFamily='"Noto Sans KR", sans-serif'
+              >
+                → {item.receives}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                NPC: {npc}
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Chip
+                label={item.limit}
+                size="small"
+                sx={{ fontFamily: '"Noto Sans KR", sans-serif' }}
+              />
+              <Checkbox
+                size="small"
+                checked={isChecked}
+                onClick={(e) => e.stopPropagation()}
+                onChange={() => handleCheck(key)}
+              />
+            </Box>
+          </Box>
+        </Grow>
+      );
+    })}
+  </Stack>
+) : (
                       <TableContainer>
                         <Table size="small">
                           <TableHead>

@@ -2,9 +2,9 @@ const checklistData = [
   {
     region: '티르코네일',
     items: [
-      { npc: '메이븐', gives: '케이트 특제 통밀빵 1개', receives: '성수 1개', limit: '일 1회' },
-      { npc: '엔델리온', gives: '케이트 특제 통밀빵 10개', receives: '성수 10개', limit: '일 1회' },
-      { npc: '케이틴', gives: '우유 10개', receives: '케이트 특제 통밀빵 3개', limit: '일 1회' },
+      { npc: '메이븐', gives: '케이틴 특제 통밀빵 1개', receives: '성수 1개', limit: '일 1회' },
+      { npc: '엔델리온', gives: '케이틴 특제 통밀빵 10개', receives: '성수 10개', limit: '일 1회' },
+      { npc: '케이틴', gives: '우유 10개', receives: '케이틴 특제 통밀빵 3개', limit: '일 1회' },
       { npc: '라사', gives: '사과 주스 1개', receives: '고급 연금술 재연소 촉매 1개', limit: '일 1회' },
       { npc: '라사', gives: '연금술 부스러기 3개', receives: '고급 연금술 재연소 촉매 1개', limit: '일 1회' },
       { npc: '라사', gives: '고급 연금술 재연소 촉매 15개', receives: '레어 연금술 재연소 촉매 1개', limit: '일 1회' },
