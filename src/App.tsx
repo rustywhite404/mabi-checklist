@@ -135,7 +135,7 @@ function App() {
         <Box sx={{ p: isMobile ? 2 : 5, borderRadius: 4, maxWidth: isNarrowPC ? '100%' : 700, width: '100%', backgroundColor: '#fff', boxShadow: 3 }}>
           <Box display="flex" flexDirection="column" gap={1.5} mb={3}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="h5" fontWeight={700}>📋 오늘의 교환 체크리스트</Typography>
+              <Typography variant="h5" fontWeight={700}>📋 오늘의 물물교환 체크리스트</Typography>
               <Button
                 variant="contained"
                 onClick={handleReset}
@@ -161,7 +161,7 @@ function App() {
             <Typography variant="body2" color="text.secondary" fontSize={13}>
               *매일 오전 6시에 자동으로 리셋됩니다.
             </Typography>
-          </Box>
+          </Box>       
 
           {checklistData.map((group) => (
             <Accordion key={group.region} defaultExpanded disableGutters sx={{ mb: 3, borderRadius: 2, backgroundColor: '#fefefe' }}>
@@ -269,8 +269,16 @@ function App() {
               </AccordionDetails>
             </Accordion>
           ))}
+
+          <Box mt={5} textAlign="center">
+            <Typography variant="caption" color="text.secondary">
+              ⓒ 칼릭스 : 베인 2025 All rights reserved.
+            </Typography>
+          </Box>
         </Box>
       </Box>
+
+      
     </ThemeProvider>
   );
 }
