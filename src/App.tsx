@@ -14,6 +14,7 @@ import blueprintData from './blueprintData';
 const CHECKLIST_KEY = 'muiChecklist';
 const EXPIRY_KEY = 'muiChecklistExpiry';
 const EXPANDED_KEY = 'muiChecklistExpanded';
+const MANUAL_COLLAPSED_KEY = 'muiChecklistManualCollapsed';
 
 const columnStyles = {
   gives: { width: '35%', fontFamily: '"Noto Sans KR", sans-serif' },
@@ -31,6 +32,7 @@ const blueprintColumnStyles = {
 function App() {
   const [checked, setChecked] = useState({});
   const [expandedState, setExpandedState] = useState({});
+  const [manualCollapsed, setManualCollapsed] = useState({});
   const [blueprintExpanded, setBlueprintExpanded] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isNarrowPC = useMediaQuery('(max-width:850px)');
@@ -73,7 +75,11 @@ function App() {
     const newExpanded = {};
     checklistData.forEach((group) => {
       const complete = isGroupComplete(group, updatedChecked);
-      newExpanded[group.region] = !complete;
+      if (manualCollapsed[group.region]) {
+        newExpanded[group.region] = false;
+      } else {
+        newExpanded[group.region] = !complete;
+      }
     });
     setExpandedState(newExpanded);
     localStorage.setItem(EXPANDED_KEY, JSON.stringify(newExpanded));
@@ -82,6 +88,7 @@ function App() {
   useEffect(() => {
     const savedExpiry = localStorage.getItem(EXPIRY_KEY);
     const savedExpanded = JSON.parse(localStorage.getItem(EXPANDED_KEY) || '{}');
+    const savedManualCollapsed = JSON.parse(localStorage.getItem(MANUAL_COLLAPSED_KEY) || '{}');
     const currentExpiry = getExpiryDate();
 
     if (savedExpiry !== currentExpiry) {
@@ -93,6 +100,8 @@ function App() {
         initialExpanded[group.region] = true;
       });
       setExpandedState(initialExpanded);
+      setManualCollapsed({});
+      localStorage.removeItem(MANUAL_COLLAPSED_KEY);
     } else {
       const savedChecked = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
       setChecked(savedChecked);
@@ -101,7 +110,8 @@ function App() {
         const groupComplete = isGroupComplete(group, savedChecked);
         initialExpanded[group.region] = !groupComplete;
       });
-      setExpandedState(initialExpanded);
+      setExpandedState(savedExpanded);
+      setManualCollapsed(savedManualCollapsed);
     }
   }, []);
 
@@ -120,7 +130,9 @@ function App() {
       resetExpanded[group.region] = true;
     });
     setExpandedState(resetExpanded);
+    setManualCollapsed({});
     localStorage.setItem(EXPANDED_KEY, JSON.stringify(resetExpanded));
+    localStorage.removeItem(MANUAL_COLLAPSED_KEY);
   };
 
   const groupByNPC = (items) => {
@@ -184,6 +196,13 @@ function App() {
                   const updatedState = { ...expandedState, [regionKey]: expanded };
                   setExpandedState(updatedState);
                   localStorage.setItem(EXPANDED_KEY, JSON.stringify(updatedState));
+
+                  const updatedManual = {
+                    ...manualCollapsed,
+                    [regionKey]: !expanded
+                  };
+                  setManualCollapsed(updatedManual);
+                  localStorage.setItem(MANUAL_COLLAPSED_KEY, JSON.stringify(updatedManual));
                 }}
                 disableGutters
                 sx={{ mb: 3, borderRadius: 2, backgroundColor: '#fefefe' }}
@@ -205,44 +224,42 @@ function App() {
                       )}
                       {isMobile ? (
                         <Box>
-                        {items.map((item) => {
-                          const key = getItemKey(regionKey, item);
-                          const isChecked = checked[key] || false;
-                      
-                          return (
-                            <Box
-                              key={key}
-                              mb={2}
-                              p={2}
-                              border={1}
-                              borderColor="#ddd"
-                              borderRadius={2}
-                              sx={{
-                                opacity: isChecked ? 0.5 : 1,
-                                backgroundColor: isChecked ? '#f5f5f5' : 'white',
-                                cursor: 'pointer',
-                                position: 'relative',
-                              }}
-                              onClick={() => handleCheck(key)}
-                            >
-                              <Box position="absolute" top={10} right={10} display="flex" alignItems="center" gap={1}>
-                                <Chip label={item.limit} size="small" />
-                                <Checkbox
-                                  size="small"
-                                  checked={isChecked}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onChange={() => handleCheck(key)}
-                                />
+                          {items.map((item) => {
+                            const key = getItemKey(regionKey, item);
+                            const isChecked = checked[key] || false;
+
+                            return (
+                              <Box
+                                key={key}
+                                mb={2}
+                                p={2}
+                                border={1}
+                                borderColor="#ddd"
+                                borderRadius={2}
+                                sx={{
+                                  opacity: isChecked ? 0.5 : 1,
+                                  backgroundColor: isChecked ? '#f5f5f5' : 'white',
+                                  cursor: 'pointer',
+                                  position: 'relative'
+                                }}
+                                onClick={() => handleCheck(key)}
+                              >
+                                <Box position="absolute" top={10} right={10} display="flex" alignItems="center" gap={1}>
+                                  <Chip label={item.limit} size="small" />
+                                  <Checkbox
+                                    size="small"
+                                    checked={isChecked}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={() => handleCheck(key)}
+                                  />
+                                </Box>
+                                <Typography fontWeight={600} mb={0.5}>{item.gives}</Typography>
+                                <Typography>→ {item.receives}</Typography>
+                                <Typography variant="caption" color="text.secondary">NPC: {item.npc}</Typography>
                               </Box>
-                      
-                              <Typography fontWeight={600} mb={0.5}>{item.gives}</Typography>
-                              <Typography>→ {item.receives}</Typography>
-                              <Typography variant="caption" color="text.secondary">NPC: {item.npc}</Typography>
-                            </Box>
-                          );
-                        })}
-                      </Box>
-                      
+                            );
+                          })}
+                        </Box>
                       ) : (
                         <TableContainer>
                           <Table size="small">
