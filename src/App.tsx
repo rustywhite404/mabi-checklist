@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box, CssBaseline, Checkbox, Typography, Button,
   createTheme, ThemeProvider, Accordion, AccordionSummary,
-  AccordionDetails, Chip, useMediaQuery, Stack, Table,
+  AccordionDetails, Chip, useMediaQuery, Table,
   TableBody, TableCell, TableContainer, TableHead,
-  TableRow
+  TableRow, Divider
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import checklistData from './checklistData';
+import blueprintData from './blueprintData';
 
 const CHECKLIST_KEY = 'muiChecklist';
 const EXPIRY_KEY = 'muiChecklistExpiry';
@@ -21,9 +22,16 @@ const columnStyles = {
   check: { width: '15%', textAlign: 'center', fontFamily: '"Noto Sans KR", sans-serif' }
 };
 
+const blueprintColumnStyles = {
+  npc: { width: '30%', fontFamily: '"Noto Sans KR", sans-serif' },
+  gives: { width: '35%', fontFamily: '"Noto Sans KR", sans-serif' },
+  receives: { width: '35%', fontFamily: '"Noto Sans KR", sans-serif' }
+};
+
 function App() {
   const [checked, setChecked] = useState({});
   const [expandedState, setExpandedState] = useState({});
+  const [blueprintExpanded, setBlueprintExpanded] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isNarrowPC = useMediaQuery('(max-width:850px)');
 
@@ -58,9 +66,8 @@ function App() {
 
   const getItemKey = (region, item) => `${region}-${item.npc}-${item.gives}-${item.receives}`;
 
-  const isGroupComplete = (group, currentChecked = checked) => {
-    return group.items.every(item => currentChecked[getItemKey(group.region, item)]);
-  };
+  const isGroupComplete = (group, currentChecked = checked) =>
+    group.items.every(item => currentChecked[getItemKey(group.region, item)]);
 
   const updateExpansionBasedOnCheck = (updatedChecked) => {
     const newExpanded = {};
@@ -196,46 +203,130 @@ function App() {
                       {!isMobile && (
                         <Typography fontSize={16} fontWeight={700} mb={1}>{npc}</Typography>
                       )}
-                      <TableContainer>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={columnStyles.gives}>주는 물품</TableCell>
-                              <TableCell sx={columnStyles.receives}>받는 물품</TableCell>
-                              <TableCell sx={columnStyles.limit}>제한</TableCell>
-                              <TableCell sx={columnStyles.check}>교환</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {items.map((item) => {
-                              const key = getItemKey(regionKey, item);
-                              const isChecked = checked[key] || false;
-                              return (
-                                <TableRow key={key} sx={{ opacity: isChecked ? 0.5 : 1 }}>
-                                  <TableCell sx={columnStyles.gives}>{item.gives}</TableCell>
-                                  <TableCell sx={columnStyles.receives}>{item.receives}</TableCell>
-                                  <TableCell align="center" sx={columnStyles.limit}>
-                                    <Chip label={item.limit} size="small" />
-                                  </TableCell>
-                                  <TableCell align="center" sx={columnStyles.check}>
-                                    <Checkbox
-                                      size="small"
-                                      checked={isChecked}
-                                      onChange={() => handleCheck(key)}
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                      {isMobile ? (
+                        <Box>
+                        {items.map((item) => {
+                          const key = getItemKey(regionKey, item);
+                          const isChecked = checked[key] || false;
+                      
+                          return (
+                            <Box
+                              key={key}
+                              mb={2}
+                              p={2}
+                              border={1}
+                              borderColor="#ddd"
+                              borderRadius={2}
+                              sx={{
+                                opacity: isChecked ? 0.5 : 1,
+                                backgroundColor: isChecked ? '#f5f5f5' : 'white',
+                                cursor: 'pointer',
+                                position: 'relative',
+                              }}
+                              onClick={() => handleCheck(key)}
+                            >
+                              <Box position="absolute" top={10} right={10} display="flex" alignItems="center" gap={1}>
+                                <Chip label={item.limit} size="small" />
+                                <Checkbox
+                                  size="small"
+                                  checked={isChecked}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={() => handleCheck(key)}
+                                />
+                              </Box>
+                      
+                              <Typography fontWeight={600} mb={0.5}>{item.gives}</Typography>
+                              <Typography>→ {item.receives}</Typography>
+                              <Typography variant="caption" color="text.secondary">NPC: {item.npc}</Typography>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                      
+                      ) : (
+                        <TableContainer>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={columnStyles.gives}>주는 물품</TableCell>
+                                <TableCell sx={columnStyles.receives}>받는 물품</TableCell>
+                                <TableCell sx={columnStyles.limit}>제한</TableCell>
+                                <TableCell sx={columnStyles.check}>교환</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {items.map((item) => {
+                                const key = getItemKey(regionKey, item);
+                                const isChecked = checked[key] || false;
+                                return (
+                                  <TableRow key={key} sx={{ opacity: isChecked ? 0.5 : 1 }}>
+                                    <TableCell sx={columnStyles.gives}>{item.gives}</TableCell>
+                                    <TableCell sx={columnStyles.receives}>{item.receives}</TableCell>
+                                    <TableCell align="center" sx={columnStyles.limit}>
+                                      <Chip label={item.limit} size="small" />
+                                    </TableCell>
+                                    <TableCell align="center" sx={columnStyles.check}>
+                                      <Checkbox
+                                        size="small"
+                                        checked={isChecked}
+                                        onChange={() => handleCheck(key)}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
                     </Box>
                   ))}
                 </AccordionDetails>
               </Accordion>
             );
           })}
+
+          <Divider sx={{ my: 4 }} />
+
+          <Accordion
+            expanded={blueprintExpanded}
+            onChange={(_, expanded) => setBlueprintExpanded(expanded)}
+            disableGutters
+            sx={{ borderRadius: 2, backgroundColor: '#fefefe' }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography fontWeight={700} color="#555">
+                📘 3레벨 설계도 교환정보
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {blueprintData.map((group) => (
+                <Box key={group.region} mb={3}>
+                  <Typography fontWeight={600} mb={1}>{group.region}</Typography>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={blueprintColumnStyles.npc}>NPC</TableCell>
+                          <TableCell sx={blueprintColumnStyles.gives}>주는 물품</TableCell>
+                          <TableCell sx={blueprintColumnStyles.receives}>받는 물품</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {group.items.map((item, idx) => (
+                          <TableRow key={`${group.region}-${item.npc}-${idx}`}>
+                            <TableCell sx={blueprintColumnStyles.npc}>{item.npc}</TableCell>
+                            <TableCell sx={blueprintColumnStyles.gives}>{item.gives}</TableCell>
+                            <TableCell sx={blueprintColumnStyles.receives}>{item.receives}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              ))}
+            </AccordionDetails>
+          </Accordion>
 
           <Box mt={5} textAlign="center">
             <Typography variant="caption" color="text.secondary">
