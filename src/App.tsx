@@ -223,44 +223,44 @@ function App() {
                         <Typography fontSize={16} fontWeight={700} mb={1}>{npc}</Typography>
                       )}
                       {isMobile ? (
-                        <Box>
-                          {items.map((item) => {
-                            const key = getItemKey(regionKey, item);
-                            const isChecked = checked[key] || false;
+                <Box>
+                  {items.map((item) => {
+                    const key = getItemKey(regionKey, item);
+                    const isChecked = checked[key] || false;
 
-                            return (
-                              <Box
-                                key={key}
-                                mb={2}
-                                p={2}
-                                border={1}
-                                borderColor="#ddd"
-                                borderRadius={2}
-                                sx={{
-                                  opacity: isChecked ? 0.5 : 1,
-                                  backgroundColor: isChecked ? '#f5f5f5' : 'white',
-                                  cursor: 'pointer',
-                                  position: 'relative'
-                                }}
-                                onClick={() => handleCheck(key)}
-                              >
-                                <Box position="absolute" top={10} right={10} display="flex" alignItems="center" gap={1}>
-                                  <Chip label={item.limit} size="small" />
-                                  <Checkbox
-                                    size="small"
-                                    checked={isChecked}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={() => handleCheck(key)}
-                                  />
-                                </Box>
-                                <Typography fontWeight={600} mb={0.5}>{item.gives}</Typography>
-                                <Typography>→ {item.receives}</Typography>
-                                <Typography variant="caption" color="text.secondary">NPC: {item.npc}</Typography>
-                              </Box>
-                            );
-                          })}
+                    return (
+                      <Box
+                        key={key}
+                        mb={1.5}
+                        p={1.5}
+                        border={1}
+                        borderColor="#ddd"
+                        borderRadius={2}
+                        sx={{
+                          opacity: isChecked ? 0.5 : 1,
+                          backgroundColor: isChecked ? '#f5f5f5' : 'white',
+                          cursor: 'pointer',
+                          position: 'relative'
+                        }}
+                        onClick={() => handleCheck(key)}
+                      >
+                        <Box position="absolute" top={10} right={10} display="flex" alignItems="center" gap={1}>
+                          <Chip label={item.limit} size="small" />
+                          <Checkbox
+                            size="small"
+                            checked={isChecked}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={() => handleCheck(key)}
+                          />
                         </Box>
-                      ) : (
+                        <Typography fontWeight={600} mb={0.5}>{item.gives}</Typography>
+                        <Typography>→ {item.receives}</Typography>
+                        <Typography variant="caption" color="text.secondary">NPC: {item.npc}</Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              ) :  (
                         <TableContainer>
                           <Table size="small">
                             <TableHead>
@@ -277,12 +277,12 @@ function App() {
                                 const isChecked = checked[key] || false;
                                 return (
                                   <TableRow key={key} sx={{ opacity: isChecked ? 0.5 : 1 }}>
-                                    <TableCell sx={columnStyles.gives}>{item.gives}</TableCell>
-                                    <TableCell sx={columnStyles.receives}>{item.receives}</TableCell>
-                                    <TableCell align="center" sx={columnStyles.limit}>
+                                    <TableCell sx={{ ...columnStyles.gives, py: 0.25 }}>{item.gives}</TableCell>
+                                    <TableCell sx={{ ...columnStyles.receives, py: 0.25 }}>{item.receives}</TableCell>
+                                    <TableCell align="center" sx={{ ...columnStyles.limit, py: 0.25 }}>
                                       <Chip label={item.limit} size="small" />
                                     </TableCell>
-                                    <TableCell align="center" sx={columnStyles.check}>
+                                    <TableCell align="center" sx={{ ...columnStyles.check, py: 0.25 }}>
                                       <Checkbox
                                         size="small"
                                         checked={isChecked}
