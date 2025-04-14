@@ -10,6 +10,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import checklistData from './checklistData';
 import blueprintData from './blueprintData';
+import dailyTasksData from './dailyTasksData';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 const CHECKLIST_KEY = 'muiChecklist';
 const EXPIRY_KEY = 'muiChecklistExpiry';
@@ -36,6 +39,10 @@ function App() {
   const [blueprintExpanded, setBlueprintExpanded] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
   const isNarrowPC = useMediaQuery('(max-width:850px)');
+  const [dailyTasksChecked, setDailyTasksChecked] = useState<boolean[][]>([]);
+  const [dailyTasksExpanded, setDailyTasksExpanded] = useState(true);
+  const DAILY_TASKS_EXPANDED_KEY = 'dailyTasksExpanded';
+  const [hasAutoCollapsedOnce, setHasAutoCollapsedOnce] = useState(false);
 
   const theme = useMemo(() => createTheme({
     typography: {
@@ -68,6 +75,11 @@ function App() {
 
   const getItemKey = (region, item) => `${region}-${item.npc}-${item.gives}-${item.receives}`;
 
+  const isAllDailyTasksComplete = () => {
+    return dailyTasksChecked.every(row => row.every(cell => cell));
+  };
+
+  
   const isGroupComplete = (group, currentChecked = checked) =>
     group.items.every(item => currentChecked[getItemKey(group.region, item)]);
 
@@ -91,6 +103,19 @@ function App() {
     const savedManualCollapsed = JSON.parse(localStorage.getItem(MANUAL_COLLAPSED_KEY) || '{}');
     const currentExpiry = getExpiryDate();
 
+    const saved = localStorage.getItem('dailyTasksChecked');
+    if (saved) {
+      setDailyTasksChecked(JSON.parse(saved));
+    } else {
+      // dailyTasksData.map을 이용해 초기값 설정
+      setDailyTasksChecked(dailyTasksData.map(group => [...group.row]));
+    }
+
+    const savedDailyTasksExpanded = localStorage.getItem(DAILY_TASKS_EXPANDED_KEY);
+    if (savedDailyTasksExpanded !== null) {
+      setDailyTasksExpanded(savedDailyTasksExpanded === 'true');
+    }
+
     if (savedExpiry !== currentExpiry) {
       localStorage.removeItem(CHECKLIST_KEY);
       localStorage.setItem(EXPIRY_KEY, currentExpiry);
@@ -102,6 +127,9 @@ function App() {
       setExpandedState(initialExpanded);
       setManualCollapsed({});
       localStorage.removeItem(MANUAL_COLLAPSED_KEY);
+
+      setDailyTasksChecked(dailyTasksData.rows.map(row => row.map(() => false)));
+      localStorage.removeItem('dailyTasksChecked');
     } else {
       const savedChecked = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
       setChecked(savedChecked);
@@ -115,6 +143,22 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const allComplete = dailyTasksChecked.every(row => row.every(cell => cell));
+  
+    // 수동으로 접은 적이 없고, 아직 자동 접힘 한 번도 안 했을 때만 자동 접힘
+    if (
+      allComplete &&
+      !manualCollapsed['dailyTasks'] &&
+      !hasAutoCollapsedOnce
+    ) {
+      setDailyTasksExpanded(false);
+      localStorage.setItem(DAILY_TASKS_EXPANDED_KEY, 'false');
+      setHasAutoCollapsedOnce(true);
+    }
+  }, [dailyTasksChecked]);
+
+
   const handleCheck = (key) => {
     const updated = { ...checked, [key]: !checked[key] };
     setChecked(updated);
@@ -122,9 +166,18 @@ function App() {
     updateExpansionBasedOnCheck(updated);
   };
 
+  const handleDailyTaskToggle = (rowIdx: number, colIdx: number) => {
+    const updated = [...dailyTasksChecked];
+    updated[rowIdx][colIdx] = !updated[rowIdx][colIdx];
+    setDailyTasksChecked(updated);
+    localStorage.setItem('dailyTasksChecked', JSON.stringify(updated));
+  };
+  
+
   const handleReset = () => {
     setChecked({});
     localStorage.removeItem(CHECKLIST_KEY);
+  
     const resetExpanded = {};
     checklistData.forEach((group) => {
       resetExpanded[group.region] = true;
@@ -133,7 +186,18 @@ function App() {
     setManualCollapsed({});
     localStorage.setItem(EXPANDED_KEY, JSON.stringify(resetExpanded));
     localStorage.removeItem(MANUAL_COLLAPSED_KEY);
+  
+    // ✅ 숙제 체크리스트도 초기화 (순서 보장)
+    const newDailyTasks = dailyTasksData.map(group => group.row.map(() => false));
+    setDailyTasksChecked(newDailyTasks);
+    localStorage.setItem('dailyTasksChecked', JSON.stringify(newDailyTasks));
+  
+    // ✅ 리셋 날짜도 초기화
+    const newExpiry = getExpiryDate();
+    localStorage.setItem(EXPIRY_KEY, newExpiry);
   };
+  
+
 
   const groupByNPC = (items) => {
     return items.reduce((acc, item) => {
@@ -154,6 +218,32 @@ function App() {
           font-weight: normal;
           font-style: normal;
         }
+
+        .custom-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%; 
+  background-color: #e0e0e0;
+  border: 2px solid #aaa;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+        .custom-check[data-checked="true"] {
+          background-color: #4caf50;
+          border-color: #388e3c;
+        }
+
+        .custom-check[data-checked="true"]::after {
+          content: '✔';
+          position: absolute;
+          top: -2px;
+          left: 4px;
+          font-size: 16px;
+          color: white;
+        }
+
       `}</style>
       <Box minHeight="100vh" display="flex" justifyContent="center" alignItems="start" sx={{ background: 'linear-gradient(to bottom right, #ffe9ec, #cde9f6)', p: isMobile ? 1 : 4 }}>
         <Box sx={{ p: isMobile ? 2 : 5, borderRadius: 4, maxWidth: isNarrowPC ? '100%' : 700, width: '100%', backgroundColor: '#fff', boxShadow: 3 }}>
@@ -182,13 +272,75 @@ function App() {
               *매일 오전 6시에 자동으로 리셋됩니다.
             </Typography>
           </Box>
+          
+          <Accordion
+  expanded={dailyTasksExpanded}
+  onChange={(_, expanded) => {
+    setDailyTasksExpanded(expanded);
+    localStorage.setItem(DAILY_TASKS_EXPANDED_KEY, String(expanded));
+  
+    const updatedManual = {
+      ...manualCollapsed,
+      dailyTasks: !expanded
+    };
+    setManualCollapsed(updatedManual);
+    localStorage.setItem(MANUAL_COLLAPSED_KEY, JSON.stringify(updatedManual));
+  
+    setHasAutoCollapsedOnce(false); // ✅ 수동 조작 시 플래그 초기화
+  }}
+  disableGutters
+  sx={{ borderRadius: 2, backgroundColor: '#fefefe' }}
+>
+  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    <Typography
+      fontWeight={700}
+      color={isAllDailyTasksComplete() ? "#bbb" : "#555"}
+      sx={isAllDailyTasksComplete() ? { textDecoration: 'line-through' } : {}}
+    >
+      📌 오늘의 숙제
+    </Typography>
+  </AccordionSummary>
+  <AccordionDetails>
+    <TableContainer>
+      <Table size="small">
+      <TableBody>
+  {dailyTasksData.map((taskGroup, rowIdx) => (
+    <TableRow key={rowIdx}>
+      <TableCell sx={{ fontWeight: 'bold' }}>{taskGroup.header}</TableCell>
+      <TableCell>
+        <Box display="flex" justifyContent="flex-end" gap={1}>
+          {(dailyTasksChecked[rowIdx] || []).map((isChecked, colIdx) => (
+            <Box
+              key={colIdx}
+              sx={{ cursor: 'pointer' }}
+              onClick={() => handleDailyTaskToggle(rowIdx, colIdx)}
+            >
+              {isChecked ? (
+                <CheckCircleIcon sx={{ color: '#4caf50' }} />
+              ) : (
+                <RadioButtonUncheckedIcon sx={{ color: '#ccc' }} />
+              )}
+            </Box>
+          ))}
+        </Box>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
+      </Table>
+    </TableContainer>
+  </AccordionDetails>
+</Accordion>
+          <Divider sx={{ my: 4 }} />
 
           {checklistData.map((group) => {
             const regionKey = group.region;
             const groupComplete = isGroupComplete(group);
             const isExpanded = expandedState[regionKey] ?? true;
-
             return (
+
+              
               <Accordion
                 key={regionKey}
                 expanded={isExpanded}
