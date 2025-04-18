@@ -128,8 +128,9 @@ function App() {
       setManualCollapsed({});
       localStorage.removeItem(MANUAL_COLLAPSED_KEY);
 
-      setDailyTasksChecked(dailyTasksData.rows.map(row => row.map(() => false)));
-      localStorage.removeItem('dailyTasksChecked');
+      const newDailyTasks = dailyTasksData.map(group => group.row.map(() => false));
+      setDailyTasksChecked(newDailyTasks);
+      localStorage.setItem('dailyTasksChecked', JSON.stringify(newDailyTasks));
     } else {
       const savedChecked = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
       setChecked(savedChecked);

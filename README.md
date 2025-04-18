@@ -1,54 +1,26 @@
-# React + TypeScript + Vite
+# 마비노기 모바일 물물교환 체크리스트 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![체크리스트 화면](https://i.imgur.com/KSpjqi5.png)
 
-Currently, two official plugins are available:
+## 🚀 프로젝트 소개
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+게임 <마비노기 모바일>에서 매일 해야하는 퀘스트를 체크하는 웹 페이지입니다. 가장 기본적인 체크리스트 형태로, 리액트 연습 겸 제작했습니다. 
 
-## Expanding the ESLint configuration
+소요 시간 : 2시간 내외 
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Tech Stack**
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+  ![React](https://img.shields.io/badge/-React-333333?style=flat&logo=React&logoColor=007396)
+  ![Typescript](https://img.shields.io/badge/-Typescript-333333?style=flat&logo=Typescript)
+  ![Vite](https://img.shields.io/badge/-Vite-333333?style=flat&logo=Vite)
+  ![Git Page](https://img.shields.io/badge/-Git_page-333333?style=flat&logo=Gitpage)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **배포 URL**  
+  [✔️ 마비노기 모바일 물물교환 체크리스트](https://rustywhite404.github.io/mabi-checklist/) 
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## 🔨 주요 구현 내용
+- 모바일에서는 체크리스트가 카드 형식으로 노출되도록 반응형 UI 구성 
+- 게임 내 재화가 초기화 되는 시간에 캐시를 삭제하여 자동으로 리셋 / 수동 리셋버튼 추가     
+- 한 아코디언 메뉴 내의 체크리스트가 모두 체크되면 자동으로 접히면서 타이틀에 취소선 처리  
+
